@@ -52,20 +52,33 @@ export const create = async (newItem: BaseTask): Promise<Task> => {
   return tasks[id];
 };
 
+// export const update = async (
+//   id: number,
+//   taskUpdate: BaseTask
+// ): Promise<Task | null> => {
+//   const item = await find(id);
+
+//   if (!item) return null;
+
+//   tasks[id] = { id, ...taskUpdate };
+
+//   return tasks[id];
+// };
+
 export const update = async (
   id: number,
-  taskUpdate: BaseTask
+  taskUpdate: Partial<Task>
 ): Promise<Task | null> => {
+
   const item = await find(id);
 
-  if (!item) {
-    return null;
-  }
+  if (!item) return null;
 
-  tasks[id] = { id, ...taskUpdate };
+  tasks[id] = { ...tasks[id], ...taskUpdate };
 
   return tasks[id];
-};
+
+}
 
 export const remove = async (id: number): Promise<null | void> => {
   const task = await find(id);
@@ -75,4 +88,14 @@ export const remove = async (id: number): Promise<null | void> => {
   }
 
   delete tasks[id];
+};
+
+export const removeAll = async (): Promise<void> => {
+
+  console.log(tasks);
+  for (const [key, value] of Object.entries(tasks)) {
+    delete tasks[parseInt(key, 10)]
+  }
+  console.log('after', tasks);
+
 };
