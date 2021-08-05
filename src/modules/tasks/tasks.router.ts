@@ -35,7 +35,7 @@ tasksRouter.get('/:id', async (req: Request, res: Response) => {
   try {
     const task: Task = await TaskService.find(id);
 
-    if (!task) return res.status(404).send("item not found");
+    if (!task) return res.status(404).send("task not found");
 
     res.status(200).send(task);
   }
@@ -47,23 +47,23 @@ tasksRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 // POST tasks
-
 tasksRouter.post("/", async (req: Request, res: Response) => {
+
+  const task: BaseTask = req.body;
+
   try {
-    const task: BaseTask = req.body;
 
     const newTask = await TaskService.create(task);
 
     res.status(201).json(newTask);
-
-  } catch (err) {
+  }
+  catch (err) {
 
     res.status(500).send(err.message);
   }
 });
 
 // PUT tasks/:id
-
 tasksRouter.put("/:id", async (req: Request, res: Response) => {
 
   const id: number = parseInt(req.params.id, 10);
@@ -83,15 +83,53 @@ tasksRouter.put("/:id", async (req: Request, res: Response) => {
     const newTask = await TaskService.create(taskUpdate);
 
     res.status(201).json(newTask);
-
-  } catch (err) {
+  }
+  catch (err) {
 
     res.status(500).send(err.message);
   }
 });
 
-// DELETE tasks/:id
+// PATCH tasks/:id
+tasksRouter.patch("/:id", async (req: Request, res: Response) => {
 
+  const id: number = parseInt(req.params.id, 10);
+  const taskUpdate: Partial<Task> = req.body;
+
+  try {
+
+    const existingTask: Task = await TaskService.find(id);
+
+    if (!existingTask) return res.status(404).send("task not found");
+
+    await TaskService.update(id, taskUpdate);
+
+    return res.sendStatus(204);
+  }
+  catch (err) {
+
+    res.status(500).send(err.message);
+  }
+});
+
+
+// DELETE tasks
+tasksRouter.delete('/', async (req: Request, res: Response) => {
+
+  try {
+
+    await TaskService.removeAll();
+
+    res.sendStatus(204);
+  }
+  catch (err) {
+
+    res.status(500).send(err.message)
+  }
+
+});
+
+// DELETE tasks/:id
 tasksRouter.delete('/:id', async (req: Request, res: Response) => {
 
   const id: number = parseInt(req.params.id, 10);
@@ -101,12 +139,10 @@ tasksRouter.delete('/:id', async (req: Request, res: Response) => {
     await TaskService.remove(id);
 
     res.sendStatus(204);
-
-  } catch (err) {
+  }
+  catch (err) {
 
     res.status(500).send(err.message)
-
   }
-
 
 });
